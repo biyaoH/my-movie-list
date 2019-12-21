@@ -3,6 +3,28 @@
   const INDEX_URL = BASE_URL + '/api/v1/movies/'
   const POSTER_URL = BASE_URL + '/posters/'
   const data = []
+  const genres = {
+    "1": "Action",
+    "2": "Adventure",
+    "3": "Animation",
+    "4": "Comedy",
+    "5": "Crime",
+    "6": "Documentary",
+    "7": "Drama",
+    "8": "Family",
+    "9": "Fantasy",
+    "10": "History",
+    "11": "Horror",
+    "12": "Music",
+    "13": "Mystery",
+    "14": "Romance",
+    "15": "Science Fiction",
+    "16": "TV Movie",
+    "17": "Thriller",
+    "18": "War",
+    "19": "Western"
+  }
+
   // 當前頁面變數
   let pageNow = 1
   // 當前模式變數
@@ -16,6 +38,42 @@
     getTotalPages(data)
     getPageData(1, data)
   }).catch((err) => console.log(err))
+
+
+  // 創建左側分類選項
+  const genreList = document.querySelector('#genre-list')
+
+  genreList.setAttribute('id', 'v-pills-tab')
+
+  for (let value in genres) {
+
+    let htmlContent = `
+    <li class="nav-item">
+    <a class="nav-link" id="v-pills-${genres[value]}-tab" data-index="${value}" data-toggle="pill" href="#v-pills-${genres[value]}" role="tab" aria-controls="v-pills-${genres[value]}">${genres[value]}</a>
+    </li>`
+
+    genreList.innerHTML += htmlContent
+  }
+
+  genreList.addEventListener('click', movieGenre)
+
+  function movieGenre() {
+
+    event.preventDefault()
+
+    const indexGenres = parseInt(event.target.dataset.index)
+    console.log(indexGenres)
+
+    let results = []
+    console.log(data[0].genres.indexOf(parseInt(indexGenres)))
+    results = data.filter(movie => movie.genres.includes(parseInt(indexGenres)) === true)
+    console.log(results)
+
+    getTotalPages(results)
+    getPageData(1, results)
+
+  }
+
 
   // listen to data panel 更多資訊與收藏按鈕監聽
   dataPanel.addEventListener('click', (event) => {
@@ -56,8 +114,19 @@
             <div class="card-body movie-item-body">
               <h5 class="card-title">${item.title}</h5>
             </div>
+            <div class="d-flex flex-wrap mb-3 ml-2">`
 
-            <!-- "More" button -->
+      item.genres.forEach(e => {
+
+        console.log(genres[e])
+
+        htmlContent += `<div class="badge badge-pill badge-info mr-2 mb-2">${genres[e]}</div>`
+      })
+
+
+      htmlContent +=
+        `</div>
+        <!-- "More" button -->
             <div class="card-footer">
               <button class="btn btn-primary btn-show-movie" data-toggle="modal" data-target="#show-movie-modal" data-id="${item.id}">More</button>
               <!-- favorite button -->
